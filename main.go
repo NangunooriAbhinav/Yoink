@@ -100,5 +100,7 @@ func main(){
 	if err != nil{
 		fmt.Println(err)
 		return
+	}else{
+		fmt.Printf("Image successfully converted and saved as %s\n", baseFileName+"."+outputFormat)
 	}
 }
