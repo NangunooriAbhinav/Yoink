@@ -74,7 +74,6 @@ func main(){
 		fmt.Println("No file path provided")
 	}
 	
-
 	for _,arg := range os.Args{
 		if arg == "-h"{
 			fmt.Println("Usage: go run main.go [file path] [-j/-p]")
