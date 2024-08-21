@@ -11,96 +11,85 @@ import (
 	"strings"
 )
 
-func loadImage(filePath string) (image.Image,string,error){
+func loadImage(filePath string) (image.Image, string, error) {
 	file, err := os.Open(filePath)
-
-	if err != nil{
-		return nil,"error in opening the file",err
+	if err != nil {
+		return nil, "", err
 	}
 	defer file.Close()
 
-	img,format,err := image.Decode(file)
-
-	if err != nil{
-		return nil,"error in decoding the file",err
+	img, format, err := image.Decode(file)
+	if err != nil {
+		return nil, "", err
 	}
 
-	return img,format,err
-
+	return img, format, nil
 }
 
-func convert(img image.Image, format string, outputFilePath string) error{
-
+func convert(img image.Image, format string, outputFilePath string) error {
 	outputFile, err := os.Create(outputFilePath)
-
-	if err != nil{
+	if err != nil {
 		return err
 	}
+	defer outputFile.Close()
 
-	var reqFormats = []string{"jpeg","png"}
-	flag := false
-
-	for _,req := range reqFormats{
-		if req == format{
-			flag = true
-			break
-		}
+	switch format {
+	case "jpeg":
+		options := jpeg.Options{Quality: 100}
+		return jpeg.Encode(outputFile, img, &options)
+	case "png":
+		return png.Encode(outputFile, img)
+	default:
+		return errors.New("unsupported format")
 	}
-
-	if !flag{
-		return errors.New("invalid format")
-	}
-
-	switch format{
-		case "jpeg":
-			options := jpeg.Options{Quality: 100}
-			err = jpeg.Encode(outputFile, img, &options)
-		case "png":
-			err = png.Encode(outputFile, img)
-		default:
-			err = errors.New("invalid format")
-	}
-
-	return err
-
 }
 
-func main(){
-	
-	outputFormat := "jpeg"
-	filePath := ""
-	
-	if(len(os.Args ) == 0){
-		fmt.Println("No file path provided")
+func main() {
+	if len(os.Args) < 3 {
+		fmt.Println("Usage: go run main.go [input file path] [output file path] [-j/-p]")
+		os.Exit(1)
 	}
-	
-	for _,arg := range os.Args{
-		if arg == "-h"{
-			fmt.Println("Usage: go run main.go [file path] [-j/-p]")
-		}else if arg == "-p"{
-			outputFormat = "png"
-		}else if arg == "-j"{
+
+	filePath := os.Args[1]
+	outputFilePath := os.Args[2]
+	var outputFormat string
+
+	if len(os.Args) == 4 {
+		switch os.Args[3] {
+		case "-j":
 			outputFormat = "jpeg"
-		}else{
-			filePath = arg
+		case "-p":
+			outputFormat = "png"
+		default:
+			fmt.Println("Invalid format flag. Use -j for JPEG or -p for PNG.")
+			os.Exit(1)
 		}
+	} else {
+		fmt.Println("Please specify the output format flag: -j for JPEG or -p for PNG.")
+		os.Exit(1)
 	}
 
-	img,_,err := loadImage(filePath)
-	
-	if err != nil{
-		fmt.Println(err)
-		return
+	if outputFormat == "" {
+		fmt.Println("No output format specified.")
+		os.Exit(1)
 	}
 
-	baseFileName := strings.TrimSuffix(filepath.Base(filePath),filepath.Ext(filePath))
-
-	err = convert(img,outputFormat,baseFileName+"."+outputFormat)
-	
-	if err != nil{
-		fmt.Println(err)
-		return
-	}else{
-		fmt.Printf("Image successfully converted and saved as %s\n", baseFileName+"."+outputFormat)
+	img, _, err := loadImage(filePath)
+	if err != nil {
+		fmt.Println("Error loading image:", err)
+		os.Exit(1)
 	}
+
+	ext := filepath.Ext(outputFilePath)
+	if ext != "."+outputFormat {
+		outputFilePath = strings.TrimSuffix(outputFilePath, ext) + "." + outputFormat
+	}
+
+	err = convert(img, outputFormat, outputFilePath)
+	if err != nil {
+		fmt.Println("Error converting image:", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("Image successfully converted and saved as %s\n", outputFilePath)
 }
