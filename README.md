@@ -69,7 +69,7 @@ After installation, you can use the `yoink` command to convert images.
 ### Basic Command Syntax
 
 ```bash
-yoink [file path] [-j/-p]
+yoink [file path] [output file path] [-j/-p]
 ```
 
 ### Options
@@ -82,7 +82,7 @@ yoink [file path] [-j/-p]
 1. **Convert an Image to JPEG**
 
    ```bash
-   yoink /path/to/image.png -j
+   yoink /path/to/image.png /path/to/output.jpg -j
    ```
 
    This will convert `image.png` to `image.jpeg`.
@@ -90,7 +90,7 @@ yoink [file path] [-j/-p]
 2. **Convert an Image to PNG**
 
    ```bash
-   yoink /path/to/image.jpg -p
+   yoink /path/to/image.jpg /path/to/output.png -p
    ```
 
    This will convert `image.jpg` to `image.png`.
