@@ -1,10 +1,11 @@
 # Yoink
 
-**Yoink** is a simple command-line tool for converting images between different formats. It currently supports converting images to JPEG and PNG formats.
+**Yoink** is a versatile command-line tool for converting files between different formats. It currently supports converting images to JPEG and PNG formats, as well as converting documents to PDF format.
 
 ## Features
 
 - Convert images to JPEG or PNG format.
+- Convert documents to PDF format.
 - Easy-to-use command-line interface.
 
 ## Installation
@@ -14,6 +15,7 @@ To install **Yoink**, follow these steps:
 ### Prerequisites
 
 - **Go** must be installed on your system. You can download and install it from [the official Go website](https://golang.org/dl/).
+- **LibreOffice** must be installed on your system for document-to-PDF conversion. You can download and install it from [the official LibreOffice website](https://www.libreoffice.org/download/download/).
 
 ### Installation Steps
 
@@ -64,36 +66,47 @@ If you prefer to manually install the tool without using the installation script
 
 ## Usage
 
-After installation, you can use the `yoink` command to convert images.
+After installation, you can use the `yoink` command to convert images and documents.
 
 ### Basic Command Syntax
 
 ```bash
-yoink [file path] [output file path] [-j/-p]
+yoink [input file path] [output file path] [flag]
 ```
 
 ### Options
 
-- `-j`: Convert the image to JPEG format.
-- `-p`: Convert the image to PNG format.
+- **Image Conversion**:
+  - `-ij`: Convert the image to JPEG format.
+  - `-ip`: Convert the image to PNG format.
+- **Document Conversion**:
+  - `-dp`: Convert the document to PDF format.
 
 ### Examples
 
 1. **Convert an Image to JPEG**
 
    ```bash
-   yoink /path/to/image.png /path/to/output.jpg -j
+   yoink /path/to/image.png /path/to/output.jpg -ij
    ```
 
-   This will convert `image.png` to `image.jpeg`.
+   This will convert `image.png` to `output.jpg`.
 
 2. **Convert an Image to PNG**
 
    ```bash
-   yoink /path/to/image.jpg /path/to/output.png -p
+   yoink /path/to/image.jpg /path/to/output.png -ip
    ```
 
-   This will convert `image.jpg` to `image.png`.
+   This will convert `image.jpg` to `output.png`.
+
+3. **Convert a Document to PDF**
+
+   ```bash
+   yoink /path/to/document.docx /path/to/output.pdf -dp
+   ```
+
+   This will convert `document.docx` to `output.pdf`.
 
 ### Help
 
@@ -112,5 +125,3 @@ If you'd like to contribute to **Yoink**, please feel free to submit a pull requ
 This project is licensed under the MIT License. See the LICENSE file for more details.
 
 ---
-
-This README file provides a clear explanation of the `yoink` tool, including how to install it, how to use it, and where to get help. You can save this content into a `README.md` file in your project's root directory.
