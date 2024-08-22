@@ -6,7 +6,9 @@ import (
 	"image"
 	"image/jpeg"
 	"image/png"
+	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 )
@@ -26,7 +28,24 @@ func loadImage(filePath string) (image.Image, string, error) {
 	return img, format, nil
 }
 
-func convert(img image.Image, format string, outputFilePath string) error {
+
+func convertDoc(inputFilePath string, outputFilePath string) error {
+
+	absPath, err := filepath.Abs(inputFilePath)
+	if err != nil {
+		return err
+	}
+
+	cmd := exec.Command("libreoffice", "--headless", "--convert-to", "pdf", absPath, "--outdir", filepath.Dir(outputFilePath))
+	err = cmd.Run()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return err
+}
+
+func convertImage(img image.Image, format string, outputFilePath string) error {
 	outputFile, err := os.Create(outputFilePath)
 	if err != nil {
 		return err
@@ -46,7 +65,7 @@ func convert(img image.Image, format string, outputFilePath string) error {
 
 func main() {
 	if len(os.Args) < 3 {
-		fmt.Println("Usage: go run main.go [input file path] [output file path] [-j/-p]")
+		fmt.Println("Usage: go run main.go [input file path] [output file path] [-i[-j/-p]],[-d[-p,-x]]")
 		os.Exit(1)
 	}
 
@@ -56,10 +75,12 @@ func main() {
 
 	if len(os.Args) == 4 {
 		switch os.Args[3] {
-		case "-j":
+		case "-ij":
 			outputFormat = "jpeg"
-		case "-p":
+		case "-ip":
 			outputFormat = "png"
+		case "-dp":
+			outputFormat = "pdf"
 		default:
 			fmt.Println("Invalid format flag. Use -j for JPEG or -p for PNG.")
 			os.Exit(1)
@@ -72,6 +93,14 @@ func main() {
 	if outputFormat == "" {
 		fmt.Println("No output format specified.")
 		os.Exit(1)
+	}else if(outputFormat == "pdf"){
+		err := convertDoc(filePath, outputFilePath)
+		if err != nil {
+			fmt.Println("Error converting document:", err)
+			os.Exit(1)
+		}
+		fmt.Printf("Document successfully converted and saved as %s\n", outputFilePath)
+		os.Exit(0)
 	}
 
 	img, _, err := loadImage(filePath)
@@ -85,7 +114,7 @@ func main() {
 		outputFilePath = strings.TrimSuffix(outputFilePath, ext) + "." + outputFormat
 	}
 
-	err = convert(img, outputFormat, outputFilePath)
+	err = convertImage(img, outputFormat, outputFilePath)
 	if err != nil {
 		fmt.Println("Error converting image:", err)
 		os.Exit(1)
