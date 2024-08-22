@@ -63,10 +63,26 @@ func convertImage(img image.Image, format string, outputFilePath string) error {
 	}
 }
 
+func printHelp() {
+	fmt.Println("Yoink - A simple tool to convert images and documents between formats.")
+	fmt.Println("Usage: yoink [input file path] [output file path] [flag]")
+	fmt.Println("Flags:")
+	fmt.Println("  -ij   Convert image to JPEG format")
+	fmt.Println("  -ip   Convert image to PNG format")
+	fmt.Println("  -dp   Convert document to PDF format")
+	fmt.Println("  -h    Show help message")
+}
+
 func main() {
-	if len(os.Args) < 3 {
-		fmt.Println("Usage: go run main.go [input file path] [output file path] [-i[-j/-p]],[-d[-p,-x]]")
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: yoink [input file path] [output file path] [flag]")
 		os.Exit(1)
+	}
+
+	// Check for the -h flag
+	if len(os.Args) == 2 && os.Args[1] == "-h" {
+		printHelp()
+		os.Exit(0)
 	}
 
 	filePath := os.Args[1]
@@ -82,18 +98,18 @@ func main() {
 		case "-dp":
 			outputFormat = "pdf"
 		default:
-			fmt.Println("Invalid format flag. Use -j for JPEG or -p for PNG.")
+			fmt.Println("Invalid format flag. Use -ij for JPEG, -ip for PNG, or -dp for PDF.")
 			os.Exit(1)
 		}
 	} else {
-		fmt.Println("Please specify the output format flag: -j for JPEG or -p for PNG.")
+		fmt.Println("Please specify the output format flag: -ij for JPEG, -ip for PNG, or -dp for PDF.")
 		os.Exit(1)
 	}
 
 	if outputFormat == "" {
 		fmt.Println("No output format specified.")
 		os.Exit(1)
-	}else if(outputFormat == "pdf"){
+	} else if outputFormat == "pdf" {
 		err := convertDoc(filePath, outputFilePath)
 		if err != nil {
 			fmt.Println("Error converting document:", err)
